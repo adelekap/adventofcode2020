@@ -1,7 +1,7 @@
 from functools import reduce
 
 from day1.expense_report_exceptions import InfeasibleSolutionException
-from day1.input import read_input
+from day1.input import read_expense_input
 
 
 def multiply_list(list_of_nums: list) -> int:
@@ -25,7 +25,7 @@ def find_target_sum_entries(expenses: list) -> list:
 
 
 def find_solution():
-    sorted_puzzle_input = sorted(read_input())
+    sorted_puzzle_input = read_expense_input()
     target_expenses = find_target_sum_entries(sorted_puzzle_input)
     print(target_expenses)
 
