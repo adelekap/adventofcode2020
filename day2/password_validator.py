@@ -19,8 +19,8 @@ def validate_with_position_rule():
 
 
 if __name__ == '__main__':
-    # valid_occurrences = validate_with_occurrence_rule()
-    # print(f'{len(valid_occurrences)} valid passwords')
+    valid_occurrences = validate_with_occurrence_rule()
+    print(f'{len(valid_occurrences)} valid passwords')
 
     valid_positions = validate_with_position_rule()
     print(f'{len(valid_positions)} valid passwords')

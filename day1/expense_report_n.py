@@ -1,11 +1,6 @@
-from functools import reduce
-
 from day1.expense_report_exceptions import InfeasibleSolutionException
 from day1.input import read_expense_input
-
-
-def multiply_list(list_of_nums: list) -> int:
-    return reduce(lambda a, b: a * b, list_of_nums)
+from utils.math_utils import multiply_list
 
 
 def find_target_sum_entries(expenses: list) -> list:
