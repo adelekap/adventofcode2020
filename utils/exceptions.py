@@ -5,7 +5,7 @@ class InfeasibleSolutionException(Exception):
     """
 
     def __str__(self):
-        return 'No feasible solution for expenses report!'
+        return 'No feasible solution found!'
 
     def __repr__(self):
         str(self)

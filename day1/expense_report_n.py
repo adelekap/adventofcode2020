@@ -1,4 +1,4 @@
-from day1.expense_report_exceptions import InfeasibleSolutionException
+from utils.exceptions import InfeasibleSolutionException
 from day1.input import read_expense_input
 from utils.math_utils import multiply_list
 
