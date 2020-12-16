@@ -7,6 +7,13 @@ class Instruction:
     command: str
     param: int
 
+    @property
+    def can_be_changed(self) -> bool:
+        return self.command == 'nop' or (self.command == 'jmp' and self.param < 0)
+
+    def change_command(self):
+        self.command = 'nop' if self.command == 'jmp' else 'jmp'
+
     def execute(self, accumulator: int) -> tuple:
         if self.command == 'acc':
             return accumulator + self.param, self.line + 1

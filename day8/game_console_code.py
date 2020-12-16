@@ -10,18 +10,24 @@ class Code:
         self.last_executed_instruction = None
         self.accumulator = 0
 
-    def _find_loop(self, instruction: Instruction):
-        if instruction in self.executed_instructions or instruction.line >= len(self.instructions):
-            self.last_executed_instruction = instruction
+    def _find_loop(self, line: int):
+        if line >= len(self.instructions) or self.instructions[line] in self.executed_instructions:
             return
 
-        self.accumulator, line = instruction.execute(self.accumulator)
+        instruction = self.instructions[line]
+        self.accumulator, next_line = instruction.execute(self.accumulator)
         self.executed_instructions.add(instruction)
+        self.last_executed_instruction = instruction
 
-        return self._find_loop(self.instructions[line])
+        return self._find_loop(next_line)
 
     def run_code(self):
-        self._find_loop(self.instructions[0])
+        self._find_loop(0)
 
     def terminated(self) -> bool:
         return self.last_executed_instruction == self.instructions[-1]
+
+    def reset_code(self):
+        self.accumulator = 0
+        self.last_executed_instruction = None
+        self.executed_instructions = set()

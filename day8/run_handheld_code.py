@@ -15,6 +15,26 @@ def find_loop() -> int:
     raise InfeasibleSolutionException
 
 
-if __name__ == '__main__':
-    # print(find_loop())
+def remove_loop():
+    code = Code(INPUT)
 
+    for line in range(len(INPUT)):
+        instruction = code.instructions[line]
+        if instruction.can_be_changed:
+            code.reset_code()
+            instruction.change_command()
+            code.run_code()
+
+            if code.terminated():
+                return code.accumulator
+
+            else:
+                instruction.change_command()
+
+    raise InfeasibleSolutionException
+
+
+if __name__ == '__main__':
+    print(find_loop())
+
+    print(remove_loop())
