@@ -9,19 +9,14 @@ OUTLET_JOLTAGE = 0
 
 class JoltageChain:
     def __init__(self, adapters: List[int]):
-        self.adapters = [OUTLET_JOLTAGE] + adapters
+        self.adapters = [Adapter(a) for a in [OUTLET_JOLTAGE] + adapters]
+        self.outlet = None
 
-        self.__chain_permutations = 0
         self.__differences = None
         self.__difference_counts = None
-        self.__outlet = None
+        self.__valid_connections = None
 
-    @property
-    def chain_permuations(self) -> int:
-        if self.outlet:
-            return self.__chain_permutations
-
-        return 0
+        self._get_valid_connections()
 
     @property
     def differences(self) -> list:
@@ -30,7 +25,7 @@ class JoltageChain:
 
             for n in range(1, len(self.adapters)):
                 adapter = self.adapters[n]
-                diff = adapter - self.adapters[n - 1]
+                diff = adapter.joltage - self.adapters[n - 1].joltage
 
                 if diff > 3:
                     break
@@ -47,24 +42,36 @@ class JoltageChain:
         return self.__difference_counts
 
     @property
-    def outlet(self) -> Adapter:
-        if self.__outlet is None:
-            self.__outlet = Adapter(0, self._find_valid_connections(0))
-        return self.__outlet
+    def num_chain_permutations(self) -> int:
+        return self.all_valid_chains(self.adapters[0], 0)
 
-    def _find_valid_connections(self, joltage: int) -> List[Adapter]:
-        connections = []
+    @property
+    def valid_connection(self) -> dict:
+        return self.__valid_connections
 
-        for a in self.adapters:
-            if joltage < a <= joltage + 3:
-                adapter = Adapter(a, self._find_valid_connections(a))
-                if not adapter.possible_connections:
-                    self.__chain_permutations += 1
-                connections.append(adapter)
-        return connections
+    def _get_valid_connections(self):
+        self.__valid_connections = {a: self._find_valid_connections(a) for a in self.adapters}
+
+        for node, connections in self.__valid_connections.items():
+            node.downstream_connections = self.__valid_connections[node]
+            for connection in connections:
+                connection.downstream_connections = self.__valid_connections[connection]
+                connection.upstream_connections.append(node)
+
+    def _find_valid_connections(self, adapter: Adapter) -> List[Adapter]:
+        return [a for a in self.adapters if adapter.joltage < a.joltage <= adapter.joltage + 3]
 
     def jolt_difference_multiplied(self) -> int:
         return self.difference_counts.get(1, 0) * self.difference_counts.get(3, 0)
+
+    def all_valid_chains(self, adapter: Adapter, count: int, ) -> int:
+        if not adapter.downstream_connections:
+            return count + 1
+
+        for connection in adapter.downstream_connections:
+            count = self.all_valid_chains(connection, count)
+
+        return count
 
 
 if __name__ == '__main__':
@@ -74,4 +81,4 @@ if __name__ == '__main__':
     print(chain.difference_counts)
     print(chain.jolt_difference_multiplied())
 
-    print(chain.chain_permuations)
+    print(chain.num_chain_permutations)
