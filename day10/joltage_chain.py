@@ -10,7 +10,6 @@ OUTLET_JOLTAGE = 0
 class JoltageChain:
     def __init__(self, adapters: List[int]):
         self.adapters = [Adapter(a) for a in [OUTLET_JOLTAGE] + adapters]
-        self.outlet = None
 
         self.__differences = None
         self.__difference_counts = None
@@ -43,7 +42,8 @@ class JoltageChain:
 
     @property
     def num_chain_permutations(self) -> int:
-        return self.all_valid_chains(self.adapters[0], 0)
+        self.all_valid_chains(self.adapters[0], set())
+        return self.adapters[0].terminating_nodes
 
     @property
     def valid_connection(self) -> dict:
@@ -64,14 +64,16 @@ class JoltageChain:
     def jolt_difference_multiplied(self) -> int:
         return self.difference_counts.get(1, 0) * self.difference_counts.get(3, 0)
 
-    def all_valid_chains(self, adapter: Adapter, count: int, ) -> int:
-        if not adapter.downstream_connections:
-            return count + 1
+    def all_valid_chains(self, adapter: Adapter, seen: set) -> int:
+        if adapter in seen or not adapter.downstream_connections:
+            return adapter.terminating_nodes
+
+        seen.add(adapter)
 
         for connection in adapter.downstream_connections:
-            count = self.all_valid_chains(connection, count)
+            adapter.add_terminating_nodes(self.all_valid_chains(connection, seen))
 
-        return count
+        return sum([n.terminating_nodes for n in adapter.downstream_connections])
 
 
 if __name__ == '__main__':
